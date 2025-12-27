@@ -1,0 +1,6 @@
+@ImaliLearn.API_HostAddress = http://localhost:5046
+
+GET {{ImaliLearn.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
