@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ImaliLearn.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+28c307d4428550cdddea82f4b77f3cdaf6e86ec7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7400e7008b83d8f08a7a19d681a5e13b69ea4b11")]
 [assembly: System.Reflection.AssemblyProductAttribute("ImaliLearn.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ImaliLearn.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
