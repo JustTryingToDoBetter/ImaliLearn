@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ImaliLearn.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7400e7008b83d8f08a7a19d681a5e13b69ea4b11")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d652a0f9ebf0d1320845e1516167cd1a55adb1c6")]
 [assembly: System.Reflection.AssemblyProductAttribute("ImaliLearn.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ImaliLearn.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

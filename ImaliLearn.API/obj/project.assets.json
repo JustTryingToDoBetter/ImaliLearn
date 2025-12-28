@@ -1436,7 +1436,10 @@
         },
         "runtime": {
           "bin/placeholder/ImaliLearn.Infrastructure.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },
