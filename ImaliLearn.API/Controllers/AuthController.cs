@@ -11,13 +11,18 @@ public class AuthController : ControllerBase
     private readonly RegisterUserService _register;
     private readonly LoginUserService _login;
 
+    private readonly RefreshTokenService _refreshService;
+
     public AuthController(
         RegisterUserService register,
-        LoginUserService login)
+        LoginUserService login,
+        RefreshTokenService refreshService)
     {
         _register = register;
         _login = login;
+        _refreshService = refreshService;
     }
+
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
@@ -36,4 +41,14 @@ public class AuthController : ControllerBase
             ? Ok(new { accessToken = result.Value })
             : Unauthorized(new { error = result.Error });
     }
+
+    [HttpPost("refresh")]
+public async Task<IActionResult> Refresh([FromBody] string refreshToken)
+{
+    var result = await _refreshService.HandleAsync(refreshToken);
+
+    return result.IsSuccess
+        ? Ok(new { accessToken = result.Value })
+        : Unauthorized(new { error = result.Error });
+}
 }

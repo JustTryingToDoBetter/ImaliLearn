@@ -1,5 +1,6 @@
 using ImaliLearn.Domain.Entities;
 using ImaliLearn.Domain.Repositories;
+using ImaliLearn.Infrastructure.Identity;
 using ImaliLearn.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,16 +24,21 @@ public class UserRepository : IUserRepository
         return new User 
         { 
             Id = Guid.Parse(applicationUser.Id),
-            Email = applicationUser.Email ?? string.Empty
+            Email = applicationUser.Email ?? string.Empty,
+            PasswordHash = applicationUser.PasswordHash ?? string.Empty,
+            CreatedAt = applicationUser.CreatedAt
         };
     }
 
     public async Task AddAsync(User user)
     {
-        var applicationUser = new User
+        var applicationUser = new ApplicationUser
         {
             Id = user.Id.ToString(),
-            Email = user.Email
+            UserName = user.Email,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            CreatedAt = user.CreatedAt
         };
         _context.Users.Add(applicationUser);
         await _context.SaveChangesAsync();

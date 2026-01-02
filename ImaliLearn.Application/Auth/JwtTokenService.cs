@@ -4,6 +4,7 @@ using System.Text;
 using ImaliLearn.Domain.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 
 namespace ImaliLearn.Application.Auth;
 
@@ -40,4 +41,9 @@ public class JwtTokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public string GenerateRefreshToken()
+{
+    return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+}
 }

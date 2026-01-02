@@ -1,5 +1,6 @@
 using ImaliLearn.Application.Common.Results;
 using ImaliLearn.Domain.Repositories;
+using ImaliLearn.Domain.Entities;
 
 namespace ImaliLearn.Application.Auth;
 
@@ -9,26 +10,40 @@ public class LoginUserService
     private readonly PasswordHasher _hasher;
     private readonly JwtTokenService _jwt;
 
+    private readonly IRefreshTokenRepository _refreshTokens;
+
     public LoginUserService(
         IUserRepository users,
         PasswordHasher hasher,
-        JwtTokenService jwt)
+        JwtTokenService jwt,
+        IRefreshTokenRepository refreshTokens)
     {
         _users = users;
         _hasher = hasher;
         _jwt = jwt;
+        _refreshTokens = refreshTokens;
     }
 
-    public async Task<Result<string>> HandleAsync(string email, string password)
+    public async Task<Result<(string accessToken, string refreshToken)>> HandleAsync(
+    string email, string password)
+{
+    var user = await _users.GetByEmailAsync(email);
+    if (user == null || !_hasher.Verify(password, user.PasswordHash))
+        return Result<(string, string)>.Failure("Invalid credentials.");
+
+    var accessToken = _jwt.GenerateToken(user.Id, user.Email);
+    var refreshTokenValue = _jwt.GenerateRefreshToken();
+
+    var refreshToken = new RefreshToken
     {
-        var user = await _users.GetByEmailAsync(email);
-        if (user == null)
-            return Result<string>.Failure("Invalid credentials.");
+        Id = Guid.NewGuid(),
+        UserId = user.Id,
+        Token = refreshTokenValue,
+        ExpiresAt = DateTime.UtcNow.AddDays(7)
+    };
 
-        if (!_hasher.Verify(password, user.PasswordHash))
-            return Result<string>.Failure("Invalid credentials.");
+    await _refreshTokens.AddAsync(refreshToken);
 
-        var token = _jwt.GenerateToken(user.Id, user.Email);
-        return Result<string>.Success(token);
-    }
+    return Result<(string, string)>.Success((accessToken, refreshTokenValue));
+}
 }

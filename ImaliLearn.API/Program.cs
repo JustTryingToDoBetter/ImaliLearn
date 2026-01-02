@@ -24,6 +24,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<RegisterUserService>();
 builder.Services.AddScoped<LoginUserService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<RefreshTokenService>();
 builder.Services
     .AddControllers()
     .ConfigureApiBehaviorOptions(options =>
