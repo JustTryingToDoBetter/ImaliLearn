@@ -1,6 +1,9 @@
 using ImaliLearn.API.Models;
 using ImaliLearn.Application.Auth;
 using Microsoft.AspNetCore.Mvc;
+using ImaliLearn.API.Security;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace ImaliLearn.API.Controllers;
 
@@ -12,15 +15,21 @@ public class AuthController : ControllerBase
     private readonly LoginUserService _login;
 
     private readonly RefreshTokenService _refreshService;
+    private readonly LogoutService _logout;
+    private readonly LogoutAllSessionsService _logoutAll;
 
     public AuthController(
         RegisterUserService register,
         LoginUserService login,
-        RefreshTokenService refreshService)
+        RefreshTokenService refreshService,
+        LogoutService logout,
+        LogoutAllSessionsService logoutAll)
     {
         _register = register;
         _login = login;
         _refreshService = refreshService;
+        _logout = logout;
+        _logoutAll = logoutAll;
     }
 
 
@@ -50,5 +59,22 @@ public async Task<IActionResult> Refresh([FromBody] string refreshToken)
     return result.IsSuccess
         ? Ok(new { accessToken = result.Value })
         : Unauthorized(new { error = result.Error });
+}
+
+[Authorize]
+[HttpPost("logout")]
+public async Task<IActionResult> Logout([FromBody] string refreshToken)
+{
+    await _logout.HandleAsync(refreshToken);
+    return NoContent();
+}
+
+[Authorize]
+[HttpPost("logout-all")]
+public async Task<IActionResult> LogoutAll()
+{
+    var userId = User.GetUserId();
+    await _logoutAll.HandleAsync(userId);
+    return NoContent();
 }
 }

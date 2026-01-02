@@ -30,6 +30,8 @@ builder.Services.AddScoped<LoginUserService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<RefreshTokenService>();
 builder.Services.AddSingleton<IAuthorizationHandler, BudgetOwnerHandler>();
+builder.Services.AddScoped<LogoutService>();
+builder.Services.AddScoped<LogoutAllSessionsService>();
 builder.Services
     .AddControllers()
     .ConfigureApiBehaviorOptions(options =>

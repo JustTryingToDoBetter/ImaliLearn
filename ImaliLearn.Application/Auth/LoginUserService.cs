@@ -9,19 +9,19 @@ public class LoginUserService
     private readonly IUserRepository _users;
     private readonly PasswordHasher _hasher;
     private readonly JwtTokenService _jwt;
+    private readonly IRefreshTokenRepository _tokens;
 
-    private readonly IRefreshTokenRepository _refreshTokens;
-
+    
     public LoginUserService(
         IUserRepository users,
         PasswordHasher hasher,
         JwtTokenService jwt,
-        IRefreshTokenRepository refreshTokens)
+        IRefreshTokenRepository tokens)
     {
         _users = users;
         _hasher = hasher;
         _jwt = jwt;
-        _refreshTokens = refreshTokens;
+        _tokens = tokens;
     }
 
     public async Task<Result<(string accessToken, string refreshToken)>> HandleAsync(
@@ -42,7 +42,8 @@ public class LoginUserService
         ExpiresAt = DateTime.UtcNow.AddDays(7)
     };
 
-    await _refreshTokens.AddAsync(refreshToken);
+    await _tokens.AddAsync(refreshToken); // store the refresh token
+    await _tokens.RevokeAllForUserAsync(user.Id); // revoke old tokens
 
     return Result<(string, string)>.Success((accessToken, refreshTokenValue));
 }
