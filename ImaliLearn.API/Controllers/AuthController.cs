@@ -1,9 +1,4 @@
-// ==========================================
-// 3️⃣ AUTH CONTROLLER
-// ==========================================
-
-// 📍 API/Controllers/AuthController.cs
-
+using ImaliLearn.API.Models;
 using ImaliLearn.Application.Auth;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,22 +8,32 @@ namespace ImaliLearn.API.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly JwtTokenService _jwtService;
+    private readonly RegisterUserService _register;
+    private readonly LoginUserService _login;
 
-    public AuthController(JwtTokenService jwtService)
+    public AuthController(
+        RegisterUserService register,
+        LoginUserService login)
     {
-        _jwtService = jwtService;
+        _register = register;
+        _login = login;
     }
 
-    // TEMP login endpoint (replace with real auth later)
-    [HttpPost("login")]
-    public IActionResult Login()
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var userId = Guid.NewGuid(); // placeholder
-        var email = "user@example.com";
+        var result = await _register.HandleAsync(request.Email, request.Password);
+        return result.IsSuccess
+            ? Ok(new { userId = result.Value })
+            : Conflict(new { error = result.Error });
+    }
 
-        var token = _jwtService.GenerateToken(userId, email);
-
-        return Ok(new { accessToken = token });
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
+    {
+        var result = await _login.HandleAsync(request.Email, request.Password);
+        return result.IsSuccess
+            ? Ok(new { accessToken = result.Value })
+            : Unauthorized(new { error = result.Error });
     }
 }

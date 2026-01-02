@@ -1,58 +1,64 @@
+// ==========================================
+// 4️⃣ CONTROLLER USES USER ID FROM JWT
+// ==========================================
+
+// 📍 API/Controllers/BudgetsController.cs
+
+using ImaliLearn.API.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ImaliLearn.Application.Budgets;
 using ImaliLearn.API.Models;
 using ImaliLearn.Application.Budgets.CreateBudgets;
 using ImaliLearn.Application.Budgets.GetUserBudgets;
-using Microsoft.AspNetCore.Mvc;
 
-namespace ImaliLearn.API.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("api/budgets")]
-public class BudgetController : ControllerBase
+public class BudgetsController : ControllerBase
 {
-    private readonly CreateBudgetService _createBudgetService;
-    private readonly GetUserBudgetsService _getUserBudgetsService;
+    private readonly CreateBudgetService _create;
+    private readonly GetUserBudgetsService _get;
 
-    public BudgetController(
-        CreateBudgetService createBudgetService,
-        GetUserBudgetsService getUserBudgetsService)
+    public BudgetsController(
+        CreateBudgetService create,
+        GetUserBudgetsService get)
     {
-        _createBudgetService = createBudgetService;
-        _getUserBudgetsService = getUserBudgetsService;
+        _create = create;
+        _get = get;
     }
 
-    // POST /api/budgets
-   [HttpPost]
-public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetRequest request)
-{
-    if (!ModelState.IsValid)
-        return BadRequest(ModelState);
-
-    var command = new CreateBudgetCommand
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateBudgetRequest request)
     {
-        UserId = request.UserId,
-        Year = request.Year,
-        Month = request.Month,
-        Income = request.Income,
-        Expenses = request.Expenses,
-        SavingsGoal = request.SavingsGoal
-    };
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    var result = await _createBudgetService.HandleAsync(command);
+        var userId = User.GetUserId();
 
-    if (!result.IsSuccess)
-        return Conflict(new { error = result.Error });
+        var command = new CreateBudgetCommand
+        {
+            UserId = userId,
+            Year = request.Year,
+            Month = request.Month,
+            Income = request.Income,
+            Expenses = request.Expenses,
+            SavingsGoal = request.SavingsGoal
+        };
 
-    return CreatedAtAction(
-        nameof(GetUserBudgets),
-        new { userId = request.UserId },
-        new { BudgetId = result.Value });
-}
+        var result = await _create.HandleAsync(command);
 
-[HttpGet("user/{userId}")]
-public async Task<IActionResult> GetUserBudgets(Guid userId)
-{
-    var result = await _getUserBudgetsService.HandleAsync(userId);
-    return Ok(result.Value);
-}
+        return result.IsSuccess
+            ? Created("", new { BudgetId = result.Value })
+            : Conflict(new { error = result.Error });
+    }
 
+    [HttpGet]
+    public async Task<IActionResult> GetMine()
+    {
+        var userId = User.GetUserId();
+        var result = await _get.HandleAsync(userId);
+
+        return Ok(result.Value);
+    }
 }

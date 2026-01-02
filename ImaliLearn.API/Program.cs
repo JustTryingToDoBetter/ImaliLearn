@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using JwtSettings = ImaliLearn.Domain.Configuration.JwtSettings;
 using System.Text;
-
+using ImaliLearn.Domain.Repositories;
+using ImaliLearn.Infrastructure.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<CreateBudgetService>();
 builder.Services.AddScoped<GetUserBudgetsService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<PasswordHasher>();
+builder.Services.AddScoped<RegisterUserService>();
+builder.Services.AddScoped<LoginUserService>();
 builder.Services
     .AddControllers()
     .ConfigureApiBehaviorOptions(options =>
