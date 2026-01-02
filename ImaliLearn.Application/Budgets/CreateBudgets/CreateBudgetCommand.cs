@@ -1,15 +1,16 @@
-
-
-
 namespace ImaliLearn.Application.Budgets.CreateBudgets;
 
-public class CreateBudgetCommand : IRequest<Result<Guid>> // Command to create a new budget
+public class CreateBudgetCommand
 {
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public decimal Income { get; set; } = 0;
-    public decimal Expenses { get; set; } = 0;
-    public decimal SavingsGoal { get; set; } = 0;
-    public int Year { get; set; }
-    public int Month { get; set; }
+    public Guid UserId { get; init; }
+
+    public int Year { get; init; }
+
+    public int Month { get; init; }
+
+    public decimal Income { get; init; }
+
+    public decimal Expenses { get; init; }
+
+    public decimal SavingsGoal { get; init; }
 }

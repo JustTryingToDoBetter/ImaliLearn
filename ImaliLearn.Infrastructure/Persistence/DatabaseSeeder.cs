@@ -1,4 +1,4 @@
-using ImaliLearn.Application.Constants;
+using ImaliLearn.Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 

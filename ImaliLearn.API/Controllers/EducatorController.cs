@@ -1,4 +1,4 @@
-using ImaliLearn.Application.Constants;
+using ImaliLearn.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

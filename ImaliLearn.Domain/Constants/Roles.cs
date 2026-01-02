@@ -1,4 +1,4 @@
-namespace ImaliLearn.Application.Constants;
+namespace ImaliLearn.Domain.Constants;
 
 public static class Roles
 {

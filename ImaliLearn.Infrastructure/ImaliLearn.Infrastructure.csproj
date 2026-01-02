@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ImaliLearn.Application\ImaliLearn.Application.csproj" />
     <ProjectReference Include="..\ImaliLearn.Domain\ImaliLearn.Domain.csproj" />
   </ItemGroup>
 

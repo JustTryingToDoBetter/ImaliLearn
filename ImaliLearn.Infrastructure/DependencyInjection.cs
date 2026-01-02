@@ -1,8 +1,9 @@
 using System.Text;
-using ImaliLearn.Application.Interfaces;
+using ImaliLearn.Domain.Interfaces;
 using ImaliLearn.Infrastructure.Configuration;
 using ImaliLearn.Infrastructure.Identity;
 using ImaliLearn.Infrastructure.Persistence;
+using ImaliLearn.Infrastructure.Repositories;
 using ImaliLearn.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -64,6 +65,9 @@ public static class DependencyInjection
         // Services
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        
+        // Repositories
+        services.AddScoped<IBudgetRepository, BudgetRepository>();
 
         return services;
     }

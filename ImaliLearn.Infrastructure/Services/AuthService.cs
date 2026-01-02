@@ -1,5 +1,5 @@
-using ImaliLearn.Application.DTOs.Auth;
-using ImaliLearn.Application.Interfaces;
+using ImaliLearn.Domain.DTOs.Auth;
+using ImaliLearn.Domain.Interfaces;
 using ImaliLearn.Infrastructure.Configuration;
 using ImaliLearn.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;

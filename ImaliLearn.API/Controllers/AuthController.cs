@@ -1,5 +1,5 @@
-using ImaliLearn.Application.DTOs.Auth;
-using ImaliLearn.Application.Interfaces;
+using ImaliLearn.Domain.DTOs.Auth;
+using ImaliLearn.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImaliLearn.API.Controllers;

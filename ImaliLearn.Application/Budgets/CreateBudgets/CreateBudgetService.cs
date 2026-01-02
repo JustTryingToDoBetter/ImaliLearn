@@ -1,40 +1,52 @@
-
-using ImaliLearn.Application.Common.Persistence;
+using ImaliLearn.Domain.Entities;
+using ImaliLearn.Domain.Interfaces;
 using ImaliLearn.Application.Common.Results;
-using ImaliLearn.Application.Budgets.CreateBudgets;
-
 
 namespace ImaliLearn.Application.Budgets.CreateBudgets;
 
-
-public class CreateBudgetServices
+public class CreateBudgetService
 {
-    private readonly IApplicationDbContext _context; // Database context for accessing application data
-    // Constructor to initialize the service with the application database context
-    public CreateBudgetServices(IApplicationDbContext context) : base(context)
+    private readonly IBudgetRepository _budgetRepository;
+
+    public CreateBudgetService(IBudgetRepository budgetRepository)
     { 
-        _context = context; // Assign the provided database context to the private field
+        _budgetRepository = budgetRepository;
     }
 
     // Method to create a new budget asynchronously
-    public async CreateBudgetService Task<Result<Guid>> Handle(CreateBudgetCommand command)
+    public async Task<Result<Guid>> HandleAsync(CreateBudgetCommand command)
     {
-        var result = await _context.ExecuteAsync(async () =>
+        if (command.Income < 0 || command.Expenses < 0 || command.SavingsGoal < 0)
+            return Result<Guid>.Failure("Values must be non-negative.");
+
+        // 1. enforce domain rules: one budget per user per month
+        bool exists = await _budgetRepository.ExistsAsync(
+            command.UserId,
+            command.Year,
+            command.Month);
+
+        if (exists)
+            return Result<Guid>.Failure("Budget already exists for this user and month.");
+
+
+        // 2. create budget entity
+        var budget = new Domain.Entities.Budget
         {
-            var budget = new Domain.Entities.Budget 
-            {
-                Name = command.Name,
-                Description = command.Description,
-                Income = command.Income,
-                Expenses = command.Expenses,
-                SavingsGoal = command.SavingsGoal,
-                Year = command.Year,
-                Month = command.Month
-            };
-            _context.Budgets.Add(budget); // Add the new budget to the database context
-            await _context.SaveChangesAsync(); // Save changes to the database
-            return budget.Id; // Return the ID of the newly created budget
-        });
+            Id = Guid.NewGuid(),
+            UserId = command.UserId,
+            Year = command.Year,
+            Month = command.Month,
+            Income = command.Income,
+            Expenses = command.Expenses,
+            SavingsGoal = command.SavingsGoal,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        // 3. persist budget entity
+        await _budgetRepository.CreateAsync(budget);
+
+        //4. return budget id
+        return Result<Guid>.Success(budget.Id);
     }
 
 }

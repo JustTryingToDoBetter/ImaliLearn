@@ -1,11 +1,23 @@
+using ImaliLearn.Application.Budgets.CreateBudgets;
 using ImaliLearn.Infrastructure;
+using ImaliLearn.Application.Budgets.GetUserBudgets;
 using ImaliLearn.Infrastructure.Persistence;
+using ImaliLearn.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddControllers();
+builder.Services.AddScoped<CreateBudgetService>();
+builder.Services.AddScoped<GetUserBudgetsService>();
+builder.Services
+    .AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.SuppressModelStateInvalidFilter = true;
+    });
+
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -20,6 +32,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

@@ -1,3 +1,4 @@
+using ImaliLearn.Domain.Entities;
 using ImaliLearn.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+
+    public DbSet<Budget> Budgets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

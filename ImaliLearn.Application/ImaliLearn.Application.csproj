@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ImaliLearn.Domain\ImaliLearn.Domain.csproj" />
+
   </ItemGroup>
 
 </Project>
