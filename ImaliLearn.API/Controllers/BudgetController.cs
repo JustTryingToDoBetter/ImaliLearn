@@ -13,8 +13,9 @@ using ImaliLearn.Application.Budgets.CreateBudgets;
 using ImaliLearn.Application.Budgets.GetUserBudgets;
 
 [Authorize(Policy = PolicyNames.MustBeAuthenticated)]
+[ApiExplorerSettings(GroupName = "v1")]
 [ApiController]
-[Route("api/budgets")]
+[Route("api/v1/budgets")]
 public class BudgetsController : ControllerBase
 {
     private readonly CreateBudgetService _create;
@@ -29,6 +30,10 @@ public class BudgetsController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create(CreateBudgetRequest request)
     {
         if (!ModelState.IsValid)

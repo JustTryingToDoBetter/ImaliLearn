@@ -3,4 +3,5 @@
   <Project Path="ImaliLearn.Application/ImaliLearn.Application.csproj" />
   <Project Path="ImaliLearn.Domain/ImaliLearn.Domain.csproj" />
   <Project Path="ImaliLearn.Infrastructure/ImaliLearn.Infrastructure.csproj" />
+  <Project Path="ImaliLearn.Web/ImaliLearn.Web.csproj" />
 </Solution>

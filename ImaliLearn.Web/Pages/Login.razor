@@ -1,0 +1,107 @@
+@page "/login"
+@using ImaliLearn.Web.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-wallet2 me-2"></i>ImaliLearn
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Sign In</h5>
+                    
+                    @if (!string.IsNullOrEmpty(_error))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @_error
+                        </div>
+                    }
+
+                    <EditForm Model="@_model" OnValidSubmit="HandleLoginAsync">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <InputText id="email" class="form-control" @bind-Value="_model.Email" 
+                                       placeholder="you@example.com" />
+                            <ValidationMessage For="@(() => _model.Email)" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <InputText id="password" type="password" class="form-control" 
+                                       @bind-Value="_model.Password" placeholder="••••••••" />
+                            <ValidationMessage For="@(() => _model.Password)" />
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" disabled="@_isLoading">
+                                @if (_isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Signing in...</span>
+                                }
+                                else
+                                {
+                                    <span>Sign In</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                    
+                    <hr class="my-4" />
+                    
+                    <p class="text-center text-muted mb-0">
+                        Don't have an account? 
+                        <a href="/register" class="text-decoration-none">Register</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel _model = new();
+    private string? _error;
+    private bool _isLoading;
+
+    private async Task HandleLoginAsync()
+    {
+        _error = null;
+        _isLoading = true;
+
+        try
+        {
+            var (success, error) = await AuthService.LoginAsync(_model.Email, _model.Password);
+            
+            if (success)
+            {
+                Navigation.NavigateTo("/budgets");
+            }
+            else
+            {
+                _error = error ?? "Login failed. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private class LoginModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <span class="text-muted me-3">Welcome!</span>
+                </Authorized>
+            </AuthorizeView>
+            <a href="https://github.com/yourrepo/ImaliLearn" target="_blank">
+                <i class="bi bi-github"></i> GitHub
+            </a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

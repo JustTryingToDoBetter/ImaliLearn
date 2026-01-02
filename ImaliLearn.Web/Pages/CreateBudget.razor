@@ -1,0 +1,149 @@
+@page "/create-budget"
+@using ImaliLearn.Web.Services
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject BudgetService BudgetService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Budget
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(_error))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @_error
+                        </div>
+                    }
+
+                    <EditForm Model="@_model" OnValidSubmit="HandleSubmitAsync">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Budget Name *</label>
+                            <InputText id="name" class="form-control" @bind-Value="_model.Name" 
+                                       placeholder="e.g., Monthly Groceries" />
+                            <ValidationMessage For="@(() => _model.Name)" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Total Amount *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R</span>
+                                <InputNumber id="amount" class="form-control" @bind-Value="_model.TotalAmount" 
+                                             placeholder="0.00" />
+                            </div>
+                            <ValidationMessage For="@(() => _model.TotalAmount)" />
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Start Date *</label>
+                                <InputDate id="startDate" class="form-control" @bind-Value="_model.StartDate" />
+                                <ValidationMessage For="@(() => _model.StartDate)" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">End Date *</label>
+                                <InputDate id="endDate" class="form-control" @bind-Value="_model.EndDate" />
+                                <ValidationMessage For="@(() => _model.EndDate)" />
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description</label>
+                            <InputTextArea id="description" class="form-control" @bind-Value="_model.Description" 
+                                           rows="3" placeholder="Optional description for this budget" />
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="/budgets" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" disabled="@_isLoading">
+                                @if (_isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Creating...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    <span>Create Budget</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private BudgetModel _model = new();
+    private string? _error;
+    private bool _isLoading;
+
+    protected override void OnInitialized()
+    {
+        _model.StartDate = DateTime.Today;
+        _model.EndDate = DateTime.Today.AddMonths(1);
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        _error = null;
+        _isLoading = true;
+
+        if (_model.EndDate <= _model.StartDate)
+        {
+            _error = "End date must be after start date";
+            _isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var request = new CreateBudgetRequest(
+                _model.Name,
+                _model.TotalAmount,
+                _model.StartDate,
+                _model.EndDate,
+                _model.Description);
+
+            var (success, error) = await BudgetService.CreateBudgetAsync(request);
+            
+            if (success)
+            {
+                Navigation.NavigateTo("/budgets");
+            }
+            else
+            {
+                _error = error ?? "Failed to create budget";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private class BudgetModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public decimal TotalAmount { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string? Description { get; set; }
+    }
+}

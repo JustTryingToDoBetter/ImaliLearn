@@ -17,6 +17,7 @@ using ImaliLearn.API.Security.Handlers;
 using ImaliLearn.API.Security.Requirements;
 using Microsoft.AspNetCore.Authorization;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -97,6 +98,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
+
+
+
 var app = builder.Build();
 
 // Seed database
@@ -105,9 +114,9 @@ await DatabaseSeeder.SeedRolesAsync(app.Services);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 

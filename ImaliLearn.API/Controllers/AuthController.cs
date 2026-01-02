@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ImaliLearn.API.Controllers;
 
+[ApiExplorerSettings(GroupName = "v1")]
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiController]
 [Route("api/auth")]
 public class AuthController : ControllerBase

@@ -5,8 +5,7 @@
 // 📍 Application/Budgets/CreateBudgets/CreateBudgetService.cs
 
 using ImaliLearn.Application.Common.Results;
-
-using ImaliLearn.Domain.Interfaces;
+using ImaliLearn.Domain.Repositories;
 
 namespace ImaliLearn.Application.Budgets.CreateBudgets;
 
@@ -39,7 +38,7 @@ public class CreateBudgetService
             CreatedAt = DateTime.UtcNow
         };
 
-        await _repository.CreateAsync(budget);
+        await _repository.AddAsync(budget);
 
         return Result<Guid>.Success(budget.Id);
     }

@@ -1,5 +1,6 @@
 using System.Text;
 using ImaliLearn.Domain.Interfaces;
+using ImaliLearn.Domain.Repositories;
 using ImaliLearn.Infrastructure.Configuration;
 using ImaliLearn.Infrastructure.Identity;
 using ImaliLearn.Infrastructure.Persistence;

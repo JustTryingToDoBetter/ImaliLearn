@@ -1,0 +1,132 @@
+@page "/register"
+@using ImaliLearn.Web.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-wallet2 me-2"></i>ImaliLearn
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Create Account</h5>
+                    
+                    @if (!string.IsNullOrEmpty(_error))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @_error
+                        </div>
+                    }
+
+                    @if (_registered)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            Registration successful! You can now <a href="/login">sign in</a>.
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="@_model" OnValidSubmit="HandleRegisterAsync">
+                            <DataAnnotationsValidator />
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <InputText id="email" class="form-control" @bind-Value="_model.Email" 
+                                           placeholder="you@example.com" />
+                                <ValidationMessage For="@(() => _model.Email)" />
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <InputText id="password" type="password" class="form-control" 
+                                           @bind-Value="_model.Password" placeholder="••••••••" />
+                                <ValidationMessage For="@(() => _model.Password)" />
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <InputText id="confirmPassword" type="password" class="form-control" 
+                                           @bind-Value="_model.ConfirmPassword" placeholder="••••••••" />
+                                <ValidationMessage For="@(() => _model.ConfirmPassword)" />
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success" disabled="@_isLoading">
+                                    @if (_isLoading)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        <span>Creating account...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Register</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                    
+                    <hr class="my-4" />
+                    
+                    <p class="text-center text-muted mb-0">
+                        Already have an account? 
+                        <a href="/login" class="text-decoration-none">Sign In</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterModel _model = new();
+    private string? _error;
+    private bool _isLoading;
+    private bool _registered;
+
+    private async Task HandleRegisterAsync()
+    {
+        _error = null;
+        _isLoading = true;
+
+        if (_model.Password != _model.ConfirmPassword)
+        {
+            _error = "Passwords do not match";
+            _isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var (success, error) = await AuthService.RegisterAsync(_model.Email, _model.Password);
+            
+            if (success)
+            {
+                _registered = true;
+            }
+            else
+            {
+                _error = error ?? "Registration failed. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private class RegisterModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}
