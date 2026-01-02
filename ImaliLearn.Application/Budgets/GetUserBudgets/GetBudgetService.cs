@@ -1,25 +1,28 @@
-using ImaliLearn.Domain.Interfaces;
+// ==========================================
+// 4️⃣ UPDATE GET USER BUDGETS USE CASE
+// ==========================================
+
+// 📍 Application/Budgets/GetUserBudgets/GetUserBudgetsService.cs
+
 using ImaliLearn.Application.Common.Results;
+using ImaliLearn.Domain.Repositories;
 
 namespace ImaliLearn.Application.Budgets.GetUserBudgets;
 
 public class GetUserBudgetsService
 {
-    private readonly IBudgetRepository _budgetRepository;
-    public GetUserBudgetsService(IBudgetRepository budgetRepository)
+    private readonly IBudgetRepository _repository;
+
+    public GetUserBudgetsService(IBudgetRepository repository)
     {
-        _budgetRepository = budgetRepository;
+        _repository = repository;
     }
-    // accept userId
+
     public async Task<Result<IReadOnlyList<BudgetSummary>>> HandleAsync(Guid userId)
     {
-        
-        //query budgets belong to user
-        var budgets = await _budgetRepository.GetBudgetsByUserIdAsync(userId);
-        // order them
-        var orderedBudgets = budgets.OrderBy(b => b.Year).ThenBy(b => b.Month);
-        // project into read model
-        var budgetSummaries = orderedBudgets.Select(b => new BudgetSummary
+        var budgets = await _repository.GetByUserIdAsync(userId);
+
+        var summaries = budgets.Select(b => new BudgetSummary
         {
             BudgetId = b.Id,
             Year = b.Year,
@@ -28,8 +31,7 @@ public class GetUserBudgetsService
             Expenses = b.Expenses,
             SavingsGoal = b.SavingsGoal
         }).ToList();
-        // return to collection of read model
-        return Result<IReadOnlyList<BudgetSummary>>.Success(budgetSummaries);
+
+        return Result<IReadOnlyList<BudgetSummary>>.Success(summaries);
     }
-    
 }

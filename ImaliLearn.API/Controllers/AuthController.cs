@@ -1,75 +1,34 @@
-using ImaliLearn.Domain.DTOs.Auth;
-using ImaliLearn.Domain.Interfaces;
+// ==========================================
+// 3️⃣ AUTH CONTROLLER
+// ==========================================
+
+// 📍 API/Controllers/AuthController.cs
+
+using ImaliLearn.Application.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImaliLearn.API.Controllers;
 
 [ApiController]
-[Route("auth")]
+[Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly JwtTokenService _jwtService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(JwtTokenService jwtService)
     {
-        _authService = authService;
+        _jwtService = jwtService;
     }
 
-    /// <summary>
-    /// Register a new user account.
-    /// </summary>
-    [HttpPost("register")]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(new AuthResponse
-            {
-                Succeeded = false,
-                Errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-            });
-        }
-
-        var result = await _authService.RegisterAsync(request);
-
-        if (!result.Succeeded)
-        {
-            return BadRequest(result);
-        }
-
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Login with email and password.
-    /// </summary>
+    // TEMP login endpoint (replace with real auth later)
     [HttpPost("login")]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public IActionResult Login()
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(new AuthResponse
-            {
-                Succeeded = false,
-                Errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-            });
-        }
+        var userId = Guid.NewGuid(); // placeholder
+        var email = "user@example.com";
 
-        var result = await _authService.LoginAsync(request);
+        var token = _jwtService.GenerateToken(userId, email);
 
-        if (!result.Succeeded)
-        {
-            return Unauthorized(result);
-        }
-
-        return Ok(result);
+        return Ok(new { accessToken = token });
     }
 }

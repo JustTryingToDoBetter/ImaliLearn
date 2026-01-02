@@ -6,6 +6,7 @@
 
 using System.Net;
 using System.Text.Json;
+using ImaliLearn.API.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace ImaliLearn.API.Middleware;
@@ -33,21 +34,23 @@ public class GlobalExceptionMiddleware
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var statusCode = exception switch
-        {
-            ArgumentException => HttpStatusCode.BadRequest,
-            InvalidOperationException => HttpStatusCode.Conflict,
-            _ => HttpStatusCode.InternalServerError
+        var (status, code) = exception switch
+        {   // Map specific exceptions to status codes and error codes
+            ArgumentException => (HttpStatusCode.BadRequest, "validation_error"),
+            InvalidOperationException => (HttpStatusCode.Conflict, "conflict_error"),
+            _ => (HttpStatusCode.InternalServerError, "server_error")
         };
 
-        var response = new
+        var response = new ErrorResponse
         {
-            error = exception.Message,
-            statusCode = (int)statusCode
+            Code = code,
+            Message = exception.Message,
+            Status = (int)status, // HTTP status code
+            TraceId = context.TraceIdentifier // Optional: include trace ID for debugging
         };
 
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
+        context.Response.StatusCode = (int)status;
 
         return context.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
