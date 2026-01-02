@@ -102,6 +102,22 @@ builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure CORS for Blazor WebAssembly frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BlazorClient", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5001",
+                "https://localhost:5001",
+                "http://localhost:7001",
+                "https://localhost:7001")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 
 
 
@@ -119,6 +135,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
+
+app.UseCors("BlazorClient");
 
 app.UseAuthentication();
 app.UseAuthorization();
