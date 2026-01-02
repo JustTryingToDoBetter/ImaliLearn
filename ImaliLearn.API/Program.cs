@@ -12,7 +12,10 @@ using JwtSettings = ImaliLearn.Domain.Configuration.JwtSettings;
 using System.Text;
 using ImaliLearn.Domain.Repositories;
 using ImaliLearn.Infrastructure.Repositories;
-
+using ImaliLearn.API.Security;
+using ImaliLearn.API.Security.Handlers;
+using ImaliLearn.API.Security.Requirements;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,13 +29,21 @@ builder.Services.AddScoped<RegisterUserService>();
 builder.Services.AddScoped<LoginUserService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<RefreshTokenService>();
+builder.Services.AddSingleton<IAuthorizationHandler, BudgetOwnerHandler>();
 builder.Services
     .AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
         options.SuppressModelStateInvalidFilter = true;
     });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyNames.MustBeAuthenticated, policy =>
+        policy.RequireAuthenticatedUser());
 
+    options.AddPolicy(PolicyNames.BudgetOwner, policy =>
+        policy.Requirements.Add(new BudgetOwnerRequirement()));
+});
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {

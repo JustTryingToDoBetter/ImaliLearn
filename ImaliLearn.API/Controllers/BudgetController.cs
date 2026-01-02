@@ -12,7 +12,7 @@ using ImaliLearn.API.Models;
 using ImaliLearn.Application.Budgets.CreateBudgets;
 using ImaliLearn.Application.Budgets.GetUserBudgets;
 
-[Authorize]
+[Authorize(Policy = PolicyNames.MustBeAuthenticated)]
 [ApiController]
 [Route("api/budgets")]
 public class BudgetsController : ControllerBase
